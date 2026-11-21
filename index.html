@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b2a4a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>رؤية - البوستر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: plant-room instrument panel, calm and exact, made for a phone in one hand.
+   IDEA: the booster skid's own pressure gauge and pump row, as on the panel door.
+   PICTURE: big dial gauge with setpoint needle + six pump tiles in a row like the skid.
+   COLOUR and TYPE: deep water blue ground, cyan water, amber for VFD, signal red alarms; IBM Plex Sans Arabic.
+   LAYOUT: one column, sticky header, bottom tab bar, cards end together. */
+:root{color-scheme:light dark;
+--bg:light-dark(#eef3f8,#06182b);--card:light-dark(#fff,#0c2640);--ink:light-dark(#0b1d30,#e8f1fa);
+--mut:light-dark(#5a6b7d,#8fa6bd);--line:light-dark(#d5dfe9,#1b3a5a);--water:#16a3d6;--vfd:#f2a516;--dol:#22b07d;--bad:#e5383b;--off:light-dark(#b6c2cf,#3b5672)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "IBM Plex Sans Arabic",Tahoma,sans-serif;overflow-x:clip;padding-bottom:84px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:12px 16px;background:#0b2a4a;color:#fff}
+header .logo{font-weight:700;font-size:20px;letter-spacing:0}header .logo small{display:block;font-size:12px;font-weight:400;opacity:.75}
+header .dev{margin-inline-start:auto;text-align:end;font-size:13px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--off);margin-inline-end:6px;vertical-align:middle}
+.dot.ok{background:#3ee08f}.dot.demo{background:var(--vfd)}.dot.bad{background:var(--bad)}
+main{max-width:720px;margin:auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 10px}
+.gauge{display:grid;grid-template-columns:minmax(0,1fr);place-items:center}
+.gauge svg{width:min(320px,100%);height:auto}
+.big{font-size:clamp(40px,12vw,56px);font-weight:700;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+.chip{font-size:13px;padding:5px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+.chip.on{color:#fff;background:var(--dol);border-color:transparent}.chip.bad{color:#fff;background:var(--bad);border-color:transparent}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:center}
+.kpis b{display:block;font-size:22px}.kpis span{font-size:13px;color:var(--mut)}
+.pumps{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:10px}
+.pump{--pc:var(--off);border-radius:14px;padding:10px 8px 8px;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--pc) 9%,transparent),transparent 60%);position:relative}
+.pump.VFD{--pc:var(--vfd)}.pump.DOL{--pc:var(--dol)}.pump.FAULT{--pc:var(--bad);border-color:var(--bad)}.pump.START{--pc:var(--water)}
+.pump.dis{opacity:.4;filter:grayscale(1)}
+.pump .top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px}
+.pump .top b{font-size:15px;white-space:nowrap}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--pc);color:#fff;white-space:nowrap}
+.pump.OFF .pill{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.pump svg{display:block;width:100%;height:auto;margin:4px 0 2px}
+.pump .bot{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);gap:4px}
+.pump .bot span{white-space:nowrap}
+.mot{fill:var(--pc)}.cas{fill:url(#gMetal);stroke:color-mix(in srgb,var(--ink) 35%,transparent);stroke-width:.6}
+.base{fill:color-mix(in srgb,var(--ink) 55%,transparent)}.edge{fill:none;stroke:color-mix(in srgb,var(--ink) 40%,transparent);stroke-width:.6}
+.imp{transform-origin:106px 55px;transform-box:view-box}.pump.VFD .imp,.pump.DOL .imp,.pump.START .imp{animation:spin var(--dur,.6s) linear infinite}
+.led{fill:var(--pc)}.pump.VFD .led,.pump.DOL .led{filter:drop-shadow(0 0 2px var(--pc))}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.pump .imp{animation:none!important}}
+@media (max-width:380px){.pump .top b{font-size:13px}.pill{font-size:11px;padding:1px 6px}}
+.alarm{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.alarm:last-child{border:0}.alarm i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--bad);margin-top:8px}
+.alarm.cleared i{background:var(--off)}.alarm small{display:block;color:var(--mut);font-size:13px}
+.empty{color:var(--mut);text-align:center;padding:18px 0}
+button,.btn{font:inherit;font-weight:600;min-height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--water);color:#fff;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}button.red{background:var(--bad)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--vfd);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+label.f{display:grid;grid-template-columns:minmax(0,1fr) 110px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+label.f small{display:block;color:var(--mut);font-size:13px}
+input,select{font:inherit;font-size:16px;min-height:44px;width:100%;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input[type=checkbox]{width:24px;min-height:24px;justify-self:end}
+.lock{color:var(--mut);font-size:13px;margin:8px 0}
+nav{position:fixed;bottom:0;inset-inline:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--card);border-top:1px solid var(--line);z-index:5}
+nav button{background:none;color:var(--mut);border-radius:0;min-height:64px;font-size:13px;padding:0;display:grid;place-items:center;gap:2px}
+nav button svg{width:24px;height:24px}nav button.act{color:var(--water)}
+nav .badge{background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-inline-start:4px}
+.view{display:none}.view.act{display:block}
+.toast{position:fixed;bottom:80px;inset-inline:16px;max-width:480px;margin:auto;background:#0b2a4a;color:#fff;padding:12px 16px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.note{font-size:13px;color:var(--mut)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9eef3"/><stop offset=".55" stop-color="#9eabb8"/><stop offset="1" stop-color="#6c7a88"/></linearGradient>
+<linearGradient id="gShine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+<radialGradient id="gEye" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1d3550"/><stop offset="1" stop-color="#0a1726"/></radialGradient>
+</defs></svg>
+<header>
+  <div class="logo">رؤية VISION<small>just push the button</small></div>
+  <div class="dev"><span class="dot" id="cdot"></span><span id="ctext">غير متصل</span><br><span id="devname" class="note" style="color:#bcd">—</span></div>
+</header>
+
+<main>
+<section class="view act" id="v-home">
+  <div class="card gauge">
+    <svg viewBox="0 0 240 200" id="gauge" aria-label="مؤشر الضغط"></svg>
+    <div class="big" id="pval">--</div>
+    <div class="note">bar · الضغط المطلوب <b id="pset">--</b></div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="card kpis">
+    <div><b id="hz">--</b><span>تردد الانفيرتر Hz</span></div>
+    <div><b id="nrun">--</b><span>مضخات تعمل</span></div>
+    <div><b id="state">--</b><span>حالة النظام</span></div>
+  </div>
+  <div class="card">
+    <h2>المضخات</h2>
+    <div class="pumps" id="pumps"></div>
+    <p class="note" style="margin:10px 0 0"><span style="color:var(--vfd)">●</span> على الانفيرتر &nbsp; <span style="color:var(--dol)">●</span> مباشر &nbsp; <span style="color:var(--bad)">●</span> عطل</p>
+  </div>
+  <div class="card">
+    <h2>التشغيل عن بعد</h2>
+    <div class="row"><button id="b-en1">تشغيل النظام</button><button class="sec" id="b-en0">إيقاف النظام</button></div>
+    <p class="note">الإيقاف عن بعد يوقف كل المضخات.</p>
+  </div>
+</section>
+
+<section class="view" id="v-alarms">
+  <div class="card">
+    <h2>الإنذارات</h2>
+    <div id="alarms"></div>
+    <div class="row"><button class="red" id="b-reset">Reset الإنذارات</button></div>
+  </div>
+</section>
+
+<section class="view" id="v-settings">
+  <div class="card">
+    <h2>إعدادات الزبون</h2>
+    <label class="f"><span>الضغط المطلوب<small>bar</small></span><input type="number" step="0.1" id="s-pSet"></label>
+    <div id="s-en"></div>
+  </div>
+  <div class="card">
+    <h2>إعدادات الفني</h2>
+    <p class="lock" id="lockmsg">مقفلة. أدخل رمز الفني في صفحة الاتصال لفتحها.</p>
+    <div id="adv"></div>
+  </div>
+  <div class="row"><button id="b-save">حفظ وإرسال للجهاز</button><button class="sec" id="b-undo">تراجع</button></div>
+</section>
+
+<section class="view" id="v-conn">
+  <div class="card">
+    <h2>الاتصال بالجهاز</h2>
+    <label class="f"><span>عنوان السيرفر<small>wss://…:8084/mqtt</small></span><input id="c-url" dir="ltr" placeholder="wss://xxxx.emqxsl.com:8084/mqtt"></label>
+    <label class="f"><span>اسم المستخدم</span><input id="c-user" dir="ltr" autocomplete="username"></label>
+    <label class="f"><span>كلمة المرور</span><input id="c-pass" type="password" dir="ltr" autocomplete="current-password"></label>
+    <label class="f"><span>رقم الجهاز<small>Device ID</small></span><input id="c-dev" dir="ltr" value="em300-01"></label>
+    <label class="f"><span>رمز الفني<small>يفتح إعدادات الفني</small></span><input id="c-pin" type="password" inputmode="numeric" dir="ltr"></label>
+    <div class="row"><button id="b-conn">اتصال</button><button class="sec" id="b-demo">وضع العرض (بدون جهاز)</button></div>
+    <p class="note" id="c-msg"></p>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button class="act" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4"/></svg>الرئيسية</button>
+  <button data-v="alarms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></svg><span>الإنذارات<span class="badge" id="abadge" hidden>0</span></span></button>
+  <button data-v="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>الإعدادات</button>
+  <button data-v="conn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12a10 10 0 0114 0M8 15a6 6 0 018 0"/><circle cx="12" cy="18" r="1.5"/></svg>الاتصال</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const ADMIN_PIN = '2580';          // change before giving the app to a customer
+const $ = id => document.getElementById(id);
+const store = { get(k){try{return localStorage.getItem('vb_'+k)}catch(e){return null}}, set(k,v){try{localStorage.setItem('vb_'+k,v)}catch(e){}} };
+let S = null, client = null, demoTimer = null, liveTimer = null, mode = 'off', admin = false, draft = null;
+
+const ADV = [
+ ['nPumps','عدد المضخات المركّبة','1 - 6'],['pRange','مدى حساس الضغط','bar (20mA)'],['spdMin','أقل سرعة للانفيرتر','%'],['kp','معامل PI (Kp)','%/bar'],['ti','زمن التكامل (Ti)','ثانية'],
+ ['tUp','زمن إضافة مضخة','ثانية'],['tDown','زمن فصل مضخة','ثانية'],['tSleep','زمن النوم','ثانية'],['stopBand','فرق النوم','bar'],['wakeBand','فرق الاستيقاظ','bar'],
+ ['tFb','مهلة Feedback الكونتاكتور','ثانية'],['tChange','زمن النقل VFD→DOL','ثانية'],['pHigh','حد الضغط العالي','bar'],['pLow','حد الضغط المنخفض','bar'],['tLow','مهلة الضغط المنخفض','ثانية'],['sim','وضع المحاكاة','bool']];
+
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)}
+function setConn(cls,txt){$('cdot').className='dot '+cls;$('ctext').textContent=txt}
+
+/* ---------- gauge ---------- */
+function arc(r,a0,a1){const p=a=>[120+r*Math.cos(a),130+r*Math.sin(a)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${x0} ${y0}A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1} ${y1}`}
+function drawGauge(P,pSet,max,pHigh){
+  const A0=Math.PI*0.8,A1=Math.PI*2.2,ang=v=>A0+(A1-A0)*Math.min(Math.max(v/max,0),1);
+  let ticks='';for(let i=0;i<=max;i++){const a=ang(i),c=Math.cos(a),s=Math.sin(a);ticks+=`<line x1="${120+92*c}" y1="${130+92*s}" x2="${120+(i%2?86:82)*c}" y2="${130+(i%2?86:82)*s}" stroke="currentColor" stroke-opacity=".5"/>`;if(i%2===0)ticks+=`<text x="${120+70*c}" y="${134+70*s}" font-size="11" text-anchor="middle" fill="currentColor" fill-opacity=".6">${i}</text>`}
+  const sa=ang(pSet);
+  $('gauge').innerHTML=`<path d="${arc(100,A0,A1)}" stroke="var(--line)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="${arc(100,ang(pHigh),A1)}" stroke="var(--bad)" stroke-width="12" fill="none" stroke-opacity=".5"/>
+  ${P>0?`<path d="${arc(100,A0,Math.max(ang(P),A0+0.01))}" stroke="var(--water)" stroke-width="12" fill="none" stroke-linecap="round"/>`:''}
+  <line x1="${120+88*Math.cos(sa)}" y1="${130+88*Math.sin(sa)}" x2="${120+112*Math.cos(sa)}" y2="${130+112*Math.sin(sa)}" stroke="var(--vfd)" stroke-width="4" stroke-linecap="round"/>${ticks}`;
+}
+const pumpSvg=()=>`<svg viewBox="0 0 140 92" aria-hidden="true">
+<rect x="6" y="80" width="128" height="6" rx="1.5" class="base"/>
+<rect x="17" y="70" width="10" height="11" class="base"/><rect x="55" y="70" width="10" height="11" class="base"/><rect x="98" y="74" width="18" height="7" class="base"/>
+<rect x="4" y="42" width="9" height="26" rx="3" class="cas"/>
+<rect x="10" y="37" width="62" height="35" rx="7" class="mot"/><rect x="10" y="37" width="62" height="35" rx="7" fill="url(#gShine)"/>
+<line x1="20" y1="41" x2="20" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="26" y1="41" x2="26" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="32" y1="41" x2="32" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="38" y1="41" x2="38" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="44" y1="41" x2="44" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="50" y1="41" x2="50" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="56" y1="41" x2="56" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><line x1="62" y1="41" x2="62" y2="69" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/>
+<rect x="28" y="28" width="22" height="10" rx="2" class="mot"/><rect x="28" y="28" width="22" height="10" rx="2" fill="url(#gShine)"/>
+<circle cx="20" cy="46" r="2.6" class="led"/>
+<rect x="72" y="49" width="14" height="12" rx="2" class="cas"/><line x1="79" y1="49" x2="79" y2="61" class="edge"/>
+<rect x="99" y="17" width="14" height="18" class="cas"/><rect x="95" y="13" width="22" height="5" rx="1" class="cas"/>
+<rect x="125" y="47" width="10" height="16" class="cas"/><rect x="133" y="44" width="5" height="22" rx="1" class="cas"/>
+<circle cx="106" cy="55" r="22" class="cas"/><path d="M106 33 a22 22 0 0 1 22 22" class="edge"/>
+<circle cx="106" cy="55" r="15" fill="url(#gEye)"/>
+<g class="imp"><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(0 106 55)"/><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(60 106 55)"/><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(120 106 55)"/><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(180 106 55)"/><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(240 106 55)"/><path d="M106 55 q 7 -3 11 -11" stroke="#d6e6f5" stroke-width="2.4" fill="none" stroke-linecap="round" transform="rotate(300 106 55)"/><circle cx="106" cy="55" r="4" fill="#d6e6f5"/></g>
+</svg>`;
+const ST={VFD:'انفيرتر',DOL:'مباشر',OFF:'متوقفة',FAULT:'عطل',START:'بدء'};
+const SEQ={IDLE:'جاهز / نائم',VFD_CLOSE:'بدء التشغيل',RUN:'يعمل',TR_STOP:'نقل مضخة',TR_OPEN:'نقل مضخة'};
+
+/* ---------- render ---------- */
+function render(s){
+  S=s; const set=s.settings||{};
+  const max=set.pRange||10, pHigh=set.pHigh||8;
+  drawGauge(s.P,s.pSet,max,pHigh);
+  $('pval').textContent=s.P.toFixed(2);$('pset').textContent=s.pSet.toFixed(1);
+  $('hz').textContent=s.run?s.hz.toFixed(1):'0';
+  $('nrun').textContent=s.pumps.filter(p=>p.state==='VFD'||p.state==='DOL').length;
+  $('state').textContent=!s.runOk?'متوقف':(SEQ[s.seq]||s.seq);
+  const chip=(on,t,bad)=>`<span class="chip ${on?(bad?'bad':'on'):''}">${t}</span>`;
+  $('chips').innerHTML=chip(s.remote,'مُمكّن عن بعد')+chip(!s.waterOk,'ماء منخفض',1)+chip(s.vfdFault,'عطل انفيرتر',1)+(s.sim?chip(1,'محاكاة'):'');
+  const np=s.pumps.length, cols=np<=3?np:(np===4?2:3);
+  $('pumps').style.setProperty('--cols',cols);
+  $('pumps').innerHTML=s.pumps.map(p=>{
+    const hz=p.state==='VFD'?(s.hz||0):(p.state==='DOL'?50:0);
+    const dur=hz>0?(0.9*50/Math.max(hz,5)).toFixed(2)+'s':'.6s';
+    return `<div class="pump ${p.state} ${p.enabled?'':'dis'}" style="--dur:${dur}"><div class="top"><b>مضخة ${p.n}</b><span class="pill">${p.enabled?ST[p.state]||p.state:'مستبعدة'}</span></div>${pumpSvg()}<div class="bot"><span dir="ltr">${hz?hz.toFixed(1)+' Hz':'—'}</span><span>${p.hours.toFixed(1)} س</span></div></div>`}).join('');
+  const al=s.alarms||[];
+  $('abadge').hidden=!al.length;$('abadge').textContent=al.length;
+  $('alarms').innerHTML=al.length?al.map(a=>`<div class="alarm ${a.active?'':'cleared'}"><i></i><div>${a.text}<small>${new Date(a.t).toLocaleString('ar-IQ')}${a.active?'':' · زال السبب، اضغط Reset'}</small></div></div>`).join(''):'<div class="empty">لا توجد إنذارات</div>';
+  if(!draft) fillSettings(set);
+}
+function fillSettings(set){
+  $('s-pSet').value=set.pSet??'';
+  const en=set.enabled||[true,true,true,true,true,true], np=Math.min(Math.max(parseInt(set.nPumps)||6,1),6);
+  $('s-en').innerHTML=en.slice(0,np).map((e,i)=>`<label class="f"><span>مضخة ${i+1} في الخدمة</span><input type="checkbox" data-en="${i}" ${e?'checked':''}></label>`).join('');
+  $('adv').innerHTML=admin?ADV.map(([k,t,u])=>`<label class="f"><span>${t}<small>${u==='bool'?'':u}</small></span>${u==='bool'?`<input type="checkbox" data-k="${k}" ${set[k]?'checked':''}>`:(k==='nPumps'?`<select data-k="nPumps">${[1,2,3,4,5,6].map(n=>`<option ${n===np?'selected':''}>${n}</option>`).join('')}</select>`:`<input type="number" step="any" data-k="${k}" value="${set[k]??''}">`)}</label>`).join(''):'';
+  $('lockmsg').hidden=admin;
+}
+document.addEventListener('input',e=>{if(e.target.closest('#v-settings'))draft=true});
+
+/* ---------- commands ---------- */
+function send(cmd,payload){
+  if(mode==='demo'){demoCmd(cmd,payload);return}
+  if(!client||!client.connected){toast('غير متصل بالجهاز');return}
+  client.publish(base()+'/cmd',JSON.stringify({cmd,payload}),{qos:1});
+}
+const base=()=>'vision/'+($('c-dev').value.trim()||'em300-01');
+$('b-en1').onclick=()=>{send('enable',true);toast('أُرسل أمر التشغيل')};
+$('b-en0').onclick=()=>{send('enable',false);toast('أُرسل أمر الإيقاف')};
+$('b-reset').onclick=()=>{send('reset',true);toast('أُرسل Reset')};
+$('b-undo').onclick=()=>{draft=null;if(S)fillSettings(S.settings||{});toast('أُلغيت التعديلات')};
+$('b-save').onclick=()=>{
+  const p={};const v=parseFloat($('s-pSet').value);if(!isNaN(v))p.pSet=v;
+  const cur=((S&&S.settings&&S.settings.enabled)||[true,true,true,true,true,true]).slice();
+  document.querySelectorAll('[data-en]').forEach(c=>cur[+c.dataset.en]=c.checked);p.enabled=cur;
+  if(admin)document.querySelectorAll('[data-k]').forEach(i=>{p[i.dataset.k]=i.type==='checkbox'?i.checked:(i.dataset.k==='nPumps'?parseInt(i.value):parseFloat(i.value))});
+  for(const k in p)if(typeof p[k]==='number'&&isNaN(p[k]))delete p[k];
+  if(p.pSet!==undefined&&(p.pSet<0.5||p.pSet>((S&&S.settings&&S.settings.pHigh)||8)-0.5)){toast('الضغط المطلوب خارج الحدود المسموحة');return}
+  send('settings',p);draft=null;toast('أُرسلت الإعدادات للجهاز');
+};
+
+/* ---------- MQTT ---------- */
+function loadMqtt(){return new Promise((ok,no)=>{if(window.mqtt)return ok();const s=document.createElement('script');s.src='https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';s.onload=ok;s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)})}
+async function connect(){
+  stopDemo();
+  const url=$('c-url').value.trim();if(!url){$('c-msg').textContent='اكتب عنوان السيرفر أولاً.';return}
+  ['url','user','dev'].forEach(k=>store.set(k,$('c-'+k).value.trim()));
+  admin=$('c-pin').value===ADMIN_PIN;
+  setConn('','جارٍ الاتصال…');$('c-msg').textContent='';
+  try{await loadMqtt()}catch(e){setConn('bad','فشل');$('c-msg').textContent='تعذّر تحميل مكتبة الاتصال. تأكد من الإنترنت.';return}
+  if(client)try{client.end(true)}catch(e){}
+  try{client=mqtt.connect(url,{username:$('c-user').value.trim(),password:$('c-pass').value,reconnectPeriod:4000,connectTimeout:10000,clientId:'app_'+Math.random().toString(16).slice(2,10)})}
+  catch(e){setConn('bad','خطأ');$('c-msg').textContent='عنوان غير صالح.';return}
+  mode='mqtt';$('devname').textContent=$('c-dev').value.trim();
+  client.on('connect',()=>{setConn('ok','متصل');client.subscribe([base()+'/status',base()+'/alarm'],{qos:1});ping();clearInterval(liveTimer);liveTimer=setInterval(ping,60000);toast('تم الاتصال')});
+  client.on('reconnect',()=>setConn('','إعادة الاتصال…'));
+  client.on('error',e=>{setConn('bad','خطأ');$('c-msg').textContent='خطأ: '+(e&&e.message||e)});
+  client.on('message',(t,m)=>{let d;try{d=JSON.parse(m.toString())}catch(e){return}
+    if(t.endsWith('/status'))render(d);else if(t.endsWith('/alarm')&&Array.isArray(d))d.forEach(a=>toast('⚠ '+a.text))});
+}
+function ping(){if(client&&client.connected&&!document.hidden)client.publish(base()+'/cmd',JSON.stringify({cmd:'live'}))}
+document.addEventListener('visibilitychange',ping);
+$('b-conn').onclick=()=>connect();
+
+/* ---------- demo mode (same logic as the device simulation, simplified) ---------- */
+let D;
+function startDemo(){
+  if(client)try{client.end(true)}catch(e){} client=null;
+  mode='demo';admin=true;setConn('demo','وضع العرض');$('devname').textContent='بيانات تجريبية';
+  D={P:3.2,spd:80,run:true,vfd:1,dol:[0],demand:2,hours:[12.4,11.9,8.2,7.5,3.1,2.8],
+     set:{pSet:4,pRange:10,pHigh:8,pLow:1.5,spdMin:60,kp:8,ti:3,tUp:10,tDown:10,tSleep:30,stopBand:0.3,wakeBand:0.3,tFb:3,tChange:0.5,tLow:60,sim:true,nPumps:6,enabled:[true,true,true,true,true,true]},
+     alarms:[{code:'P6',text:'مضخة 6: سقط الكونتاكتور DOL أثناء التشغيل (أوفرلود أو فصل)',t:Date.now()-3600e3,active:false}],fault:5,remote:true,t:0};
+  clearInterval(demoTimer);demoTimer=setInterval(demoStep,1000);demoStep();toast('وضع العرض: بيانات تجريبية');
+}
+function stopDemo(){clearInterval(demoTimer);demoTimer=null}
+function demoStep(){
+  D.t++;if(D.t%40===0)D.demand=[1.2,2,3.4,2.6][(D.t/40)%4|0];
+  const s=D.set;
+  if(!D.remote){D.run=false;D.dol=[];D.vfd=-1}
+  else{ if(D.vfd<0){D.vfd=pick();D.run=D.vfd>=0;D.spd=s.spdMin}
+    const e=s.pSet-D.P;D.spd=Math.min(100,Math.max(s.spdMin,D.spd+s.kp*e*0.3));
+    if(D.spd>=99&&D.P<s.pSet-0.2&&pick()>=0){D.dol.push(D.vfd);D.vfd=pick();D.spd=s.spdMin}
+    if(D.spd<=s.spdMin+1&&D.P>s.pSet+0.2&&D.dol.length)D.dol.shift();}
+  const cap=D.dol.length+(D.run?(D.spd/100)**2:0);D.P+=((Math.min(Math.max(5+2.5*(cap-D.demand),0),9.5))-D.P)/3;
+  [...D.dol,D.vfd].forEach(i=>{if(i>=0)D.hours[i]+=1/3600});
+  render({P:D.P,pSet:s.pSet,spd:D.spd,hz:D.spd/2,run:D.run,seq:D.run?'RUN':'IDLE',runOk:D.remote,remote:D.remote,waterOk:true,vfdFault:false,sim:true,settings:s,
+    pumps:D.hours.slice(0,s.nPumps||6).map((h,i)=>({n:i+1,enabled:s.enabled[i],state:i===D.fault?'FAULT':i===D.vfd?'VFD':D.dol.includes(i)?'DOL':'OFF',fault:i===D.fault?'TRIP-DOL':null,hours:h})),alarms:D.alarms});
+  function pick(){let b=-1;for(let i=0;i<(s.nPumps||6);i++)if(s.enabled[i]&&i!==D.fault&&i!==D.vfd&&!D.dol.includes(i)&&(b<0||D.hours[i]<D.hours[b]))b=i;return b}
+}
+function demoCmd(cmd,p){
+  if(cmd==='enable')D.remote=!!p;
+  if(cmd==='reset'){D.alarms=D.alarms.filter(a=>a.active);D.fault=-1}
+  if(cmd==='settings'){Object.assign(D.set,p);const n=D.set.nPumps||6;D.dol=D.dol.filter(i=>D.set.enabled[i]&&i<n);if(D.vfd>=0&&(!D.set.enabled[D.vfd]||D.vfd>=n))D.vfd=-1;draft=null}
+  demoStep();
+}
+$('b-demo').onclick=()=>startDemo();
+
+/* ---------- navigation ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('act',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('act',v.id==='v-'+b.dataset.v));window.scrollTo(0,0)});
+
+['url','user','dev'].forEach(k=>{const v=store.get(k);if(v)$('c-'+k).value=v});
+if(store.get('url'))connect();else startDemo();
+if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js')}catch(e){}}
+}
+</script>
+</body>
+</html>
